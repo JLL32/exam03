@@ -38,7 +38,7 @@ void print_buffer(char *buffer, t_zone zone) {
   }
 }
 
-int in_cercle(float x, float y, t_shape shape) {
+int in_circle(float x, float y, t_shape shape) {
   float distance;
   distance = sqrtf(powf(x - shape.x, 2.) + powf(y - shape.y, 2.));
   if (distance <= shape.radius) {
@@ -52,7 +52,7 @@ int in_cercle(float x, float y, t_shape shape) {
 void render_shape(t_shape shape, char *buffer, t_zone zone) {
   for (int i = 0; i < zone.h; i++) {
     for (int j = 0; j < zone.w; j++) {
-      const int ret = in_cercle(j, i, shape);
+      const int ret = in_circle(j, i, shape);
       if ((shape.fill == 'c' && ret == 2) || (shape.fill == 'C' && ret))
         buffer[(i * zone.w) + j] = shape.c;
     }
