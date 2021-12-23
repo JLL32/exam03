@@ -59,9 +59,12 @@ void render_shape(t_shape shape, char *buffer, t_zone zone) {
   }
 }
 
-int render(FILE *file, char *buffer, t_zone zone) {
+int render(FILE *file, t_zone zone) {
   t_shape shape;
   int ret = 0;
+  char buffer[zone.h * zone.w];
+  memset(buffer, zone.back, sizeof(buffer));
+
   while ((ret = fscanf(file, "%c %f %f %f %c\n", &shape.fill, &shape.x,
                        &shape.y, &shape.radius, &shape.c)) != -1) {
     if (ret != 5 || shape.radius <= 0.0f ||
@@ -69,22 +72,29 @@ int render(FILE *file, char *buffer, t_zone zone) {
       return 1;
     render_shape(shape, buffer, zone);
   }
+  print_buffer(buffer, zone);
   return 0;
 }
 
 int main(int argc, char **argv) {
   if (argc != 2)
     return error("Error: Argument\n");
+
   FILE *file = fopen(argv[1], "r");
   if (!file)
     return error("Error: Operation file corrupted\n");
+
   t_zone zone = {.w = 0, .h = 0, .back = '\0'};
-  if (get_zone(&zone, file))
+  if (get_zone(&zone, file)) {
+    fclose(file);
     return error("Error: Operation file corrupted\n");
-  char buffer[zone.h * zone.w];
-  memset(buffer, zone.back, sizeof(buffer));
-  if (render(file, buffer, zone))
+  }
+
+  if (render(file, zone)) {
+    fclose(file);
     return error("Error: Operation file corrupted\n");
-  print_buffer(buffer, zone);
+  }
+
+  fclose(file);
   return (0);
 }
